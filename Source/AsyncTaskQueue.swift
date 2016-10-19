@@ -33,7 +33,7 @@ import Foundation
 ///
 /// AsyncTaskQueue does not cache results. Non-concurrent requests for the same 
 /// task identifier may result in duplicate task operations if the earlier task 
-/// operation finishes before the next task request arrives. It is the caller's 
+/// operation finishes before the next task request arrives. It is the caller's
 /// responsiblity to cache results if needed and to ensure that subsequent tasks 
 /// aren't needlessly requested.
 ///
@@ -41,7 +41,7 @@ import Foundation
 /// queue priority, but the priority of the underlying task operation resolves 
 /// to the highest priority among the active requests. Adding or cancelling 
 /// requests will cause the resolved priority to be recomputed. If the last 
-/// remaining request is cancelled, the operation itself will be cancelled.
+/// remaining request is cancelled, the whole task operation will be cancelled.
 public class AsyncTaskQueue<TaskID: Hashable, Result> {
     
     // MARK: Public Typealiases
