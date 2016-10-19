@@ -102,6 +102,12 @@ public class AsyncTaskQueue<TaskID: Hashable, Result> {
     /// appended to the existing task operation's requests. Otherwise, a new
     /// task operation will be created with this request as the initial request.
     /// 
+    /// - note: It is also possible that there is an existing task operation 
+    /// but the request could not be added to it because the operation was 
+    /// cancelled (or cancelling) or finished (or finishing). This is not likely
+    /// to occur often. If it occurs, a new task operation will be created and 
+    /// the request will be added to it.
+    /// 
     /// - parameter task: The task block. This block will be quietly ignored if
     /// an existing task operation already exists for `taskId`.
     /// 
