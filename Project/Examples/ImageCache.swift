@@ -58,7 +58,13 @@ class ImageCache {
         // for the existing task. AsyncTaskQueue handles that logic automatically.
         
         var asyncToken: ImageTaskQueue.RequestToken!
-        let operationQueue = OperationQueue()
+        
+        // The operation queue and the task internals will be passed into the
+        // task and cancellation blocks below. If those blocks are ignored (as
+        // they will be for subsequent concurrent requests for the same image),
+        // the duplicate operation queue and internals will be unused.
+        
+        var operationQueue: OperationQueue? = nil
         let internals = ImageTaskInternals(url: url, directory: directory)
         
         // Again, please note that if there's already an existing task operation
@@ -68,17 +74,20 @@ class ImageCache {
         
         queue.enqueue(
             task: { (finish) in
+                // This block will only be executed once, regardless of the
+                // number of concurrent requests for the image at `url`.
                 let check = CheckForCachedFileOperation(internals: internals)
                 let download = DownloadOperation(internals: internals)
                 let crop = CropOperation(internals: internals)
                 download.addDependency(check)
                 crop.addDependency(download)
                 let ops = [check, download, crop]
-                operationQueue.addOperations(ops)
+                operationQueue = OperationQueue()
+                operationQueue!.addOperations(ops)
             },
             taskId: url,
             cancellation: {
-                operationQueue.cancelAllOperations()
+                operationQueue?.cancelAllOperations()
             },
             preferredPriority: preferredPriority,
             tokenHandler: { token in
