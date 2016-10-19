@@ -11,7 +11,14 @@ import AsyncOperations
 
 /// Contrived example class that makes a HEAD request for a given URL. Its a
 /// concrete subclass of AsyncOperation, which makes it easy to chain it
-/// together with other (NS)Operations via standard dependencies.
+/// together with other (NS)Operations via standard dependencies:
+/// 
+///     let head = HeadRequestOperation(url: u) { result in
+///         switch (result) {...}
+///     }
+///     let finish = BlockOperation {...}
+///     finish.addDependency(head)
+///
 class HeadRequestOperation: AsyncOperation {
     
     enum Result {
