@@ -62,7 +62,6 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
     /// finished. If you fail to invoke the finish function, the task will 
     /// remain in its executing state indefinitely.
     /// 
-    /// - 
     public init(task: @escaping Task, cancellation: @escaping Cancellation) {
         self.task = task
         self.cancellation = cancellation
