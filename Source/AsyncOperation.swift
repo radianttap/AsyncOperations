@@ -18,6 +18,9 @@ import Foundation
 /// 
 /// AsyncOperation is not meant to be used directly, but only via concrete 
 /// subclasses. Subclasses must override `execute(finish:)` (see below).
+/// 
+/// - seealso: AsyncBlockOperation
+/// - seealso: AsyncTaskOperation
 @objc(JTSAsyncOperation)
 open class AsyncOperation: Operation {
     
