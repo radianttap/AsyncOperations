@@ -8,6 +8,7 @@
 
 import Foundation
 
+/// 
 public class AsyncTaskOperation<Result>: AsyncOperation {
     
     public typealias Task = (@escaping Finish) -> Void
@@ -29,6 +30,23 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
     public init(task: @escaping Task, cancellation: @escaping Cancellation) {
         self.task = task
         self.cancellation = cancellation
+    }
+    
+    public init(task: @escaping Task, cancellation: @escaping Cancellation, priority: Operation.QueuePriority, tokenHandler: (RequestToken) -> Void, resultHandler: @escaping ResultHandler) {
+        
+        self.task = task
+        self.cancellation = cancellation
+        
+        super.init()
+        
+        addRequest(
+            priority: priority,
+            tokenHandler: { token in
+                tokenHandler(token!)
+            },
+            resultHandler: resultHandler
+        )
+        
     }
     
     // MARK: Public Methods

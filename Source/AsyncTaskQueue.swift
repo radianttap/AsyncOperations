@@ -17,7 +17,7 @@ public class AsyncTaskQueue<TaskID: Hashable, Result> {
     public typealias Cancellation = () -> Void
     public typealias RequestToken = NSUUID
     public typealias ResultHandler = (Result) -> Void
-    public typealias RequestTokenHandler = (RequestToken?) -> Void
+    public typealias RequestTokenHandler = (RequestToken) -> Void
     
     // MARK: Private Typealiases
     
@@ -73,9 +73,7 @@ public class AsyncTaskQueue<TaskID: Hashable, Result> {
             let operation = TaskOperation(
                 taskID: taskId,
                 task: task,
-                cancellation: cancellation
-            )
-            operation.addRequest(
+                cancellation: cancellation,
                 priority: priority,
                 tokenHandler: tokenHandler,
                 resultHandler: resultHandler
@@ -104,9 +102,24 @@ public class AsyncTaskQueue<TaskID: Hashable, Result> {
 }
 
 private class AsyncTaskQueueOperation<TaskID: Hashable, Result>: AsyncTaskOperation<Result> {
+    
     let taskID: TaskID
+    
     init(taskID: TaskID, task: @escaping Task, cancellation: @escaping Cancellation) {
         self.taskID = taskID
         super.init(task: task, cancellation: cancellation)
+    }
+    
+    init(taskID: TaskID, task: @escaping Task, cancellation: @escaping Cancellation, priority: Operation.QueuePriority, tokenHandler: (RequestToken) -> Void, resultHandler: @escaping ResultHandler) {
+        
+        self.taskID = taskID
+        super.init(
+            task: task,
+            cancellation: cancellation,
+            priority: priority,
+            tokenHandler: tokenHandler,
+            resultHandler: resultHandler
+        )
+        
     }
 }

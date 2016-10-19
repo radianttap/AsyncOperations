@@ -12,7 +12,7 @@ import Foundation
 public class AsyncBlockOperation: AsyncOperation {
     
     public typealias Finish = () -> Void
-    public typealias Execution = (Finish) -> Void
+    public typealias Execution = (@escaping Finish) -> Void
     
     private let execution: Execution
     
