@@ -49,7 +49,7 @@ public class AsyncTaskQueue<TaskID: Hashable, Result> {
     
     // MARK: Public Methods
     
-    public func enqueue(task: @escaping Task, taskId: TaskID, cancellation: @escaping Cancellation, priority: Operation.QueuePriority = .normal, tokenHandler: RequestTokenHandler, resultHandler: @escaping ResultHandler) {
+    public func enqueue(task: @escaping Task, taskId: TaskID, cancellation: @escaping Cancellation, preferredPriority: Operation.QueuePriority = .normal, tokenHandler: RequestTokenHandler, resultHandler: @escaping ResultHandler) {
         
         // We'll check this in a moment.
         var needToCreateNewOperation = true
@@ -57,7 +57,7 @@ public class AsyncTaskQueue<TaskID: Hashable, Result> {
         // Attempt to add this request to an existing operation, if any exists 
         // that is in a state to allow adding additional requests.
         taskOperations[taskId]?.addRequest(
-            priority: priority,
+            preferredPriority: preferredPriority,
             tokenHandler: { token in
                 if let token = token {
                     needToCreateNewOperation = false
@@ -74,7 +74,7 @@ public class AsyncTaskQueue<TaskID: Hashable, Result> {
                 taskID: taskId,
                 task: task,
                 cancellation: cancellation,
-                priority: priority,
+                preferredPriority: preferredPriority,
                 tokenHandler: tokenHandler,
                 resultHandler: resultHandler
             )
@@ -90,12 +90,15 @@ public class AsyncTaskQueue<TaskID: Hashable, Result> {
         taskOperations.forEach { $0.1.cancelRequest(with: token) }
     }
     
-    public func adjustPriorityForRequest(with token: RequestToken, priority: Operation.QueuePriority) {
+    public func adjustPriorityForRequest(with token: RequestToken, preferredPriority: Operation.QueuePriority) {
         // Calling `forEach` is just as efficient as searching for a task with
         // a matching request ID. This also covers the very remote possiblity
         // of a request ID collision across two tasks.
         taskOperations.forEach {
-            $0.1.adjustPriorityForRequest(with: token, priority: priority)
+            $0.1.adjustPriorityForRequest(
+                with: token,
+                preferredPriority: preferredPriority
+            )
         }
     }
     
@@ -110,13 +113,13 @@ private class AsyncTaskQueueOperation<TaskID: Hashable, Result>: AsyncTaskOperat
         super.init(task: task, cancellation: cancellation)
     }
     
-    init(taskID: TaskID, task: @escaping Task, cancellation: @escaping Cancellation, priority: Operation.QueuePriority, tokenHandler: (RequestToken) -> Void, resultHandler: @escaping ResultHandler) {
+    init(taskID: TaskID, task: @escaping Task, cancellation: @escaping Cancellation, preferredPriority: Operation.QueuePriority, tokenHandler: (RequestToken) -> Void, resultHandler: @escaping ResultHandler) {
         
         self.taskID = taskID
         super.init(
             task: task,
             cancellation: cancellation,
-            priority: priority,
+            preferredPriority: preferredPriority,
             tokenHandler: tokenHandler,
             resultHandler: resultHandler
         )

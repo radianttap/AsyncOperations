@@ -8,8 +8,32 @@
 
 import Foundation
 
+/// A generic subclass of AsyncOperation which manages a one-to-many 
+/// relationship between itself and a dynamic number of requests. The result of 
+/// the task execution is distributed among all active requests.
+///
+/// The generic `<Result>` parameter allows for domain-specific flexibility. For 
+/// example, an image cache might only need something as simple as a `UIImage?`,
+/// whereas a more complex task might use a custom enum with success and error
+/// cases.
+///
+/// Requests can be cancelled individually. Each request has its own preferred
+/// queue priority, but the priority of the task operation resolves to the
+/// highest priority among the active requests. Adding or cancelling requests
+/// will cause the resolved priority to be recomputed. If the last remaining
+/// request is cancelled, the operation itself will be cancelled.
 /// 
+/// AsyncTaskOperation can be used by itself, or in combination with other
+/// (NS)Operations in your own (NS)OperationQueue. 
+/// 
+/// If you need to also ensure that a given task is only performed once per some
+/// arbitrary task identifier (again, an image cache is a good example) consider
+/// using AsyncTaskQueue.
+/// 
+/// - seealso: AsyncTaskQueue
 public class AsyncTaskOperation<Result>: AsyncOperation {
+    
+    // MARK: Typealiases
     
     public typealias Task = (@escaping Finish) -> Void
     public typealias Finish = (Result) -> Void
@@ -17,6 +41,8 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
     public typealias RequestToken = NSUUID
     public typealias ResultHandler = (Result) -> Void
     public typealias RequestTokenHandler = (RequestToken?) -> Void
+    
+    // MARK: Private Properties
     
     private let task: Task
     private let cancellation: Cancellation
@@ -32,7 +58,7 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
         self.cancellation = cancellation
     }
     
-    public init(task: @escaping Task, cancellation: @escaping Cancellation, priority: Operation.QueuePriority, tokenHandler: (RequestToken) -> Void, resultHandler: @escaping ResultHandler) {
+    public init(task: @escaping Task, cancellation: @escaping Cancellation, preferredPriority: Operation.QueuePriority, tokenHandler: (RequestToken) -> Void, resultHandler: @escaping ResultHandler) {
         
         self.task = task
         self.cancellation = cancellation
@@ -40,7 +66,7 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
         super.init()
         
         addRequest(
-            priority: priority,
+            preferredPriority: preferredPriority,
             tokenHandler: { token in
                 tokenHandler(token!)
             },
@@ -51,7 +77,7 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
     
     // MARK: Public Methods
     
-    public func addRequest(priority: Operation.QueuePriority = .normal, tokenHandler: RequestTokenHandler = {_ in}, resultHandler: @escaping ResultHandler) {
+    public func addRequest(preferredPriority: Operation.QueuePriority = .normal, tokenHandler: RequestTokenHandler = {_ in}, resultHandler: @escaping ResultHandler) {
         
         doLocked {
             let canContinue: Bool = {
@@ -62,7 +88,7 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
             }()
             if canContinue {
                 let request = Request(
-                    priority: priority,
+                    preferredPriority: preferredPriority,
                     resultHandler: resultHandler
                 )
                 let token = request.token
@@ -104,9 +130,9 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
         }
     }
     
-    public func adjustPriorityForRequest(with token: RequestToken, priority: Operation.QueuePriority) {
+    public func adjustPriorityForRequest(with token: RequestToken, preferredPriority: Operation.QueuePriority) {
         doLocked {
-            unsafe_requests[token]?.priority = priority
+            unsafe_requests[token]?.preferredPriority = preferredPriority
             queuePriority = unsafe_highestPriorityAmongRequests()
         }
     }
@@ -148,7 +174,7 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
     // MARK: Private Methods
     
     private func unsafe_highestPriorityAmongRequests() -> Operation.QueuePriority {
-        let priorities = unsafe_requests.flatMap({$0.1.priority.rawValue})
+        let priorities = unsafe_requests.flatMap({$0.1.preferredPriority.rawValue})
         if let max = priorities.max() {
             return Operation.QueuePriority(rawValue: max) ?? queuePriority
         } else {
@@ -165,14 +191,15 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
 }
 
 private class Request<Result> {
+    
     typealias ResultHandler = (Result) -> Void
 
     let token = NSUUID()
     let resultHandler: ResultHandler
-    var priority: Operation.QueuePriority
+    var preferredPriority: Operation.QueuePriority
     
-    init(priority: Operation.QueuePriority, resultHandler: @escaping ResultHandler) {
-        self.priority = priority
+    init(preferredPriority: Operation.QueuePriority, resultHandler: @escaping ResultHandler) {
+        self.preferredPriority = preferredPriority
         self.resultHandler = resultHandler
     }
     

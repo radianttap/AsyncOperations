@@ -41,7 +41,7 @@ class ImageCache {
     
     // MARK: Public Methods
     
-    func getImage(url: URL, priority: Operation.QueuePriority = .normal, completion: @escaping (UIImage?) -> Void) -> CallbackMode {
+    func getImage(url: URL, preferredPriority: Operation.QueuePriority = .normal, completion: @escaping (UIImage?) -> Void) -> CallbackMode {
         
         assert(Thread.current.isMainThread)
         
@@ -80,7 +80,7 @@ class ImageCache {
             cancellation: {
                 operationQueue.cancelAllOperations()
             },
-            priority: priority,
+            preferredPriority: preferredPriority,
             tokenHandler: { token in
                 asyncToken = token
             },
@@ -102,8 +102,11 @@ class ImageCache {
         queue.cancelRequest(with: token)
     }
     
-    func adjustPriorityForRequest(with token: RequestToken, priority: Operation.QueuePriority) {
-        queue.adjustPriorityForRequest(with: token, priority: priority)
+    func adjustPriorityForRequest(with token: RequestToken, preferredPriority: Operation.QueuePriority) {
+        queue.adjustPriorityForRequest(
+            with: token,
+            preferredPriority: preferredPriority
+        )
     }
     
 }
