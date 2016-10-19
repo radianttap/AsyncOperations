@@ -4,13 +4,13 @@ A toolbox of NSOperation subclasses for a variety of asynchronous programming ne
 
 ## Just Show Me The Source
 
-- [AsyncOperation](https://github.com/jaredsinclair/AsyncOperations/blob/master/Source/AsyncOperation.swift) *abstract base class*
+- [AsyncOperation](https://github.com/jaredsinclair/AsyncOperations/blob/master/Source/AsyncOperation.swift) *is the abstract base class used throughout.*
 
-- [AsyncBlockOperation](https://github.com/jaredsinclair/AsyncOperations/blob/master/Source/AsyncBlockOperation.swift) *simple block execution*
+- [AsyncBlockOperation](https://github.com/jaredsinclair/AsyncOperations/blob/master/Source/AsyncBlockOperation.swift) *offers simple asynchronous execution of a block.*
 
-- [AsyncTaskOperation](https://github.com/jaredsinclair/AsyncOperations/blob/master/Source/AsyncTaskOperation.swift) *multiple requests, shared result*
+- [AsyncTaskOperation](https://github.com/jaredsinclair/AsyncOperations/blob/master/Source/AsyncTaskOperation.swift) *manages multiple requests, passing a shared generic result back to all callers.*
 
-- [AsyncTaskQueue](https://github.com/jaredsinclair/AsyncOperations/blob/master/Source/AsyncTaskQueue.swift) *coalesces identical task operations*
+- [AsyncTaskQueue](https://github.com/jaredsinclair/AsyncOperations/blob/master/Source/AsyncTaskQueue.swift) *coalesces identical task operations so expensive work is only performed once.*
 
 ## Asynchronous NSOperations
 
