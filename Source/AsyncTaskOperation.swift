@@ -131,7 +131,13 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
     /// the token value. It is conceivable that an implementation might need to
     /// use the request token as part of updating some other internal state in a
     /// manner that is guaranteed to occur before the result handler fires (for 
-    /// example, showing/hiding an indeterminate activity indicator).
+    /// example, showing/hiding an indeterminate activity indicator). For these
+    /// reasons, the token is returned via a non-escaping closure.
+    /// 
+    /// - Warning: The token handler is invoked from inside a critical section
+    /// of code managed by a non-recursive lock. Calling methods or setting
+    /// properties on an AsyncTaskOperation from inside a token handler could
+    /// lead to deadlock and is not supported.
     public func addRequest(preferredPriority: Operation.QueuePriority = .normal, tokenHandler: RequestTokenHandler = {_ in}, resultHandler: @escaping ResultHandler) {
         
         doLocked {
