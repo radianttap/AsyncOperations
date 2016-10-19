@@ -224,8 +224,7 @@ public class AsyncTaskOperation<Result>: AsyncOperation {
         var canContinue: Bool!
         doLocked {
             canContinue = {
-                return !isCancelled
-                    && !isCancelling
+                return !isCancelled // don't check for isCancelling
                     && !isFinishing
                     && !isFinished
             }()

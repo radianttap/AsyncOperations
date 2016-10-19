@@ -15,7 +15,7 @@ class AsyncTaskOperationTests: XCTestCase {
     
     func test_itExecutesASimpleTask() {
         
-        let exp = expectation(description: "\(#function)")
+        let exp = expectation(description: #function)
         
         let task = AsyncTaskOperation<[String]>(
             task: { finish in
@@ -42,7 +42,7 @@ class AsyncTaskOperationTests: XCTestCase {
     
     func test_itExecutesAMultiStepTask() {
         
-        let exp = expectation(description: "\(#function)")
+        let exp = expectation(description: #function)
         let utilityQueue = OperationQueue()
         
         let task = AsyncTaskOperation<[String]>(
@@ -82,9 +82,11 @@ class AsyncTaskOperationTests: XCTestCase {
         waitForExpectations(timeout: 5)
     }
     
+    // MARK: Result Handlers
+    
     func test_itInvokesAllResultHandlers() {
         
-        let exp = expectation(description: "\(#function)")
+        let exp = expectation(description: #function)
         
         let task = AsyncTaskOperation<[String]>(
             task: { finish in
@@ -117,6 +119,65 @@ class AsyncTaskOperationTests: XCTestCase {
         
         task.start()
         waitForExpectations(timeout: 5)
+        
+    }
+    
+    // MARK: Cancellation
+    
+    func test_itCancelsAfterRemovingAllRequests() {
+        
+        let exp = expectation(description: #function)
+        
+        // Create a task that takes several seconds to finish.
+        
+        let task = AsyncTaskOperation<[String]>(
+            task: { finish in
+                DispatchQueue.main.asyncAfter(deadline: .now() + 5) {
+                    let accumulator = TestAccumulator()
+                    accumulator.strings.append("One")
+                    finish(accumulator.strings)
+                }
+            },
+            cancellation: {
+                // The cancellation handler should be invoked after the
+                // last remaining request is removed.
+                exp.fulfill()
+            }
+        )
+        
+        // Add 10 requests, collecting their tokens.
+        
+        typealias TokenType = AsyncTaskOperation<[String]>.RequestToken
+        var tokens = [TokenType]()
+        for _ in 0...10 {
+            task.addRequest(
+                preferredPriority: .normal,
+                tokenHandler: { token in
+                    if let token = token {
+                        tokens.append(token)
+                    }
+                },
+                resultHandler: { result in
+                    XCTFail()
+                }
+            )
+        }
+        XCTAssert(tokens.count > 0)
+        
+        // Start the task. Remember it takes 5 seconds to finish.
+        
+        task.start()
+        
+        // Immediately cancel all requests.
+        
+        tokens.forEach {
+            task.cancelRequest(with: $0)
+        }
+        
+        // Wait 10 seconds to be sure there's plenty of time to test for the
+        // cancellation.
+        
+        waitForExpectations(timeout: 10)
         
     }
     
@@ -227,7 +288,7 @@ class AsyncTaskOperationTests: XCTestCase {
     
     func test_itReturnsNoTokenWhenTheTaskIsFinished() {
         
-        let exp = expectation(description: "\(#function)")
+        let exp = expectation(description: #function)
 
         let task = AsyncTaskOperation<[String]>(
             task: { finish in
