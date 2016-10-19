@@ -17,6 +17,8 @@
 		473FA2721DB6E6AD003836AE /* Blocks.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473FA2711DB6E6AD003836AE /* Blocks.swift */; };
 		473FA2741DB6EA93003836AE /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473FA2731DB6EA93003836AE /* ImageCache.swift */; };
 		473FA2761DB7AAE4003836AE /* AsyncTaskOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473FA2751DB7AAE4003836AE /* AsyncTaskOperationTests.swift */; };
+		473FA2781DB7B4F2003836AE /* AsyncTaskQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473FA2771DB7B4F2003836AE /* AsyncTaskQueueTests.swift */; };
+		473FA27A1DB7B51A003836AE /* AsyncBlockOperationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 473FA2791DB7B51A003836AE /* AsyncBlockOperationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +46,8 @@
 		473FA2711DB6E6AD003836AE /* Blocks.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Blocks.swift; sourceTree = "<group>"; };
 		473FA2731DB6EA93003836AE /* ImageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		473FA2751DB7AAE4003836AE /* AsyncTaskOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncTaskOperationTests.swift; sourceTree = "<group>"; };
+		473FA2771DB7B4F2003836AE /* AsyncTaskQueueTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncTaskQueueTests.swift; sourceTree = "<group>"; };
+		473FA2791DB7B51A003836AE /* AsyncBlockOperationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AsyncBlockOperationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,7 +112,9 @@
 		473FA24C1DB6D746003836AE /* AsyncOperationsTests */ = {
 			isa = PBXGroup;
 			children = (
+				473FA2791DB7B51A003836AE /* AsyncBlockOperationTests.swift */,
 				473FA2751DB7AAE4003836AE /* AsyncTaskOperationTests.swift */,
+				473FA2771DB7B4F2003836AE /* AsyncTaskQueueTests.swift */,
 				473FA24F1DB6D746003836AE /* Info.plist */,
 			);
 			path = AsyncOperationsTests;
@@ -288,6 +294,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				473FA2761DB7AAE4003836AE /* AsyncTaskOperationTests.swift in Sources */,
+				473FA27A1DB7B51A003836AE /* AsyncBlockOperationTests.swift in Sources */,
+				473FA2781DB7B4F2003836AE /* AsyncTaskQueueTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
