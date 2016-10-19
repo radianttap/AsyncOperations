@@ -86,14 +86,18 @@ public class AsyncTaskQueue<TaskID: Hashable, Result> {
     public func cancelRequest(with token: RequestToken) {
         // Calling `forEach` is just as efficient as searching for a task with
         // a matching request ID. This also covers the very remote possiblity
-        // of a request ID collision across two tasks.
+        // of a request ID collision across two tasks, as well as the less 
+        // remote possibility that two tasks with the same id will be in the
+        // operation queue, however briefly.
         taskOperations.forEach { $0.1.cancelRequest(with: token) }
     }
     
     public func adjustPriorityForRequest(with token: RequestToken, preferredPriority: Operation.QueuePriority) {
         // Calling `forEach` is just as efficient as searching for a task with
         // a matching request ID. This also covers the very remote possiblity
-        // of a request ID collision across two tasks.
+        // of a request ID collision across two tasks, as well as the less
+        // remote possibility that two tasks with the same id will be in the
+        // operation queue, however briefly.
         taskOperations.forEach {
             $0.1.adjustPriorityForRequest(
                 with: token,
