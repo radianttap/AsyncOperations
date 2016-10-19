@@ -101,7 +101,7 @@ class AsyncTaskOperationTests: XCTestCase {
         
         var resultCount = 0
         
-        for _ in 0...10 {
+        for _ in 0...9 {
             task.addRequest(
                 preferredPriority: .normal,
                 tokenHandler: { token in
@@ -149,7 +149,7 @@ class AsyncTaskOperationTests: XCTestCase {
         
         typealias TokenType = AsyncTaskOperation<[String]>.RequestToken
         var tokens = [TokenType]()
-        for _ in 0...10 {
+        for _ in 0...9 {
             task.addRequest(
                 preferredPriority: .normal,
                 tokenHandler: { token in
@@ -245,7 +245,7 @@ class AsyncTaskOperationTests: XCTestCase {
             }
         )
         
-        for _ in 0...10 {
+        for _ in 0...9 {
             task.addRequest(
                 preferredPriority: .normal,
                 tokenHandler: { (token) in
